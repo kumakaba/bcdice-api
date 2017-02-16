@@ -6,7 +6,7 @@ BCDiceを提供するAPIサーバー (unicorn起動版)
 
 ## Demo
 
-https://bcdice.herokuapp.com (本家Demoでありunicorn関係ない)
+https://bcdice.herokuapp.com (本家Demoでありunicornは関係ない)
 
 ## What is BCDice
 
@@ -18,7 +18,7 @@ BCDiceは[どどんとふ](http://www.dodontof.com)をはじめとして、[TRPG
 ## Setup
 
 ```
-$ git clone https://github.com/kumakaba/bcdice-api.git
+$ git clone -b kmkb-unicorn https://github.com/kumakaba/bcdice-api.git
 $ cd bcdice-api
 $ git checkout `git describe --abbrev=0` #直近のリリースに移動
 $ git submodule init
