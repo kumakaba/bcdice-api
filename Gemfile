@@ -12,3 +12,6 @@ group :development, :test do
   gem "test-unit"
   gem "rack-test"
 end
+
+gem "unicorn"
+

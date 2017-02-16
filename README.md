@@ -1,12 +1,12 @@
 # BCDice-API
 
-BCDiceを提供するWebAPIサーバー
+BCDiceを提供するAPIサーバー (unicorn起動版)
 
 [![Build Status](https://travis-ci.org/NKMR6194/bcdice-api.svg?branch=master)](https://travis-ci.org/NKMR6194/bcdice-api)
 
 ## Demo
 
-https://bcdice.herokuapp.com
+https://bcdice.herokuapp.com (本家Demoでありunicorn関係ない)
 
 ## What is BCDice
 
@@ -18,13 +18,16 @@ BCDiceは[どどんとふ](http://www.dodontof.com)をはじめとして、[TRPG
 ## Setup
 
 ```
-$ git clone https://github.com/NKMR6194/bcdice-api.git
+$ git clone https://github.com/kumakaba/bcdice-api.git
 $ cd bcdice-api
 $ git checkout `git describe --abbrev=0` #直近のリリースに移動
 $ git submodule init
 $ git submodule update
 $ bundle install
-$ bundle exec rackup
+$ cp unicorn.rb.sample unicorn.rb
+$ bundle exec unicorn -l 127.0.0.1:9292 -c unicorn.rb -D
+
+$ kill -QUIT `cat /tmp/bcdice-api.unicorn.pid`
 ```
 
 実際に運用する場合には、UnicornやPumaの利用をお勧めします。（[参考資料](http://recipes.sinatrarb.com/p/deployment/nginx_proxied_to_unicorn)）

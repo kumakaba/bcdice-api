@@ -18,6 +18,9 @@ GEM
       rack-protection (= 2.0.0)
       tilt (~> 2.0)
     sinatra-contrib (2.0.0)
+    rack-test (0.6.3)
+      rack (>= 1.0)
+    raindrops (0.17.0)
       backports (>= 2.0)
       multi_json
       mustermann (~> 1.0)
@@ -30,6 +33,9 @@ GEM
     test-unit (3.2.6)
       power_assert
     tilt (2.0.8)
+    unicorn (5.2.0)
+      kgio (~> 2.6)
+      raindrops (~> 0.7)
 
 PLATFORMS
   ruby
@@ -42,6 +48,7 @@ DEPENDENCIES
   sinatra-contrib
   sinatra-jsonp
   test-unit
+  unicorn
 
 BUNDLED WITH
    1.15.3
