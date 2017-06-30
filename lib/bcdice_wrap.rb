@@ -43,7 +43,7 @@ class BCDice
 end
 
 Dir.glob("bcdice/src/diceBot/*.rb").each do |path|
-  if ["_Template.rb", "test.rb", "DiceBotLoader.rb"].include?(File.basename(path))
+  if ["_Template.rb", "test.rb", "DiceBotLoader.rb", "DiceBotLoaderList.rb"].include?(File.basename(path))
     next
   end
   require path
