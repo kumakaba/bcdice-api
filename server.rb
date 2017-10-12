@@ -4,19 +4,23 @@ $:.unshift File.join(__dir__, "bcdice", "src")
 $:.unshift File.join(__dir__, "lib")
 
 require 'sinatra'
-require 'sinatra/json'
+require 'sinatra/jsonp'
 require 'bcdice_wrap'
+require 'exception'
 
 module BCDiceAPI
-  VERSION = "0.3.0"
+  VERSION = "0.5.1"
 end
 
 
 helpers do
   def diceroll(system, command)
     dicebot = BCDice::DICEBOTS[system]
-    if dicebot.nil? || command.nil?
-      return nil, nil, nil
+    if dicebot.nil?
+      raise UnsupportedDicebot
+    end
+    if command.nil?
+      raise CommandError
     end
 
     bcdice = BCDiceMaker.new.newBcDice
@@ -28,6 +32,10 @@ helpers do
     result, secret = bcdice.dice_command
     dices = bcdice.getRandResults.map {|dice| {faces: dice[1], value: dice[0]}}
 
+    if result.nil?
+      raise CommandError
+    end
+
     return result, secret, dices
   end
 end
@@ -37,30 +45,26 @@ get "/" do
 end
 
 get "/v1/version" do
-  json api: BCDiceAPI::VERSION, bcdice: BCDice::VERSION
+  jsonp api: BCDiceAPI::VERSION, bcdice: BCDice::VERSION
 end
 
 get "/v1/systems" do
-  json systems: BCDice::SYSTEMS
+  jsonp systems: BCDice::SYSTEMS
 end
 
 get "/v1/systeminfo" do
   dicebot = BCDice::DICEBOTS[params[:system]]
   if dicebot.nil?
-    json ok: false
-  else
-    json ok: true, systeminfo: dicebot.info
+    raise UnsupportedDicebot
   end
+
+  jsonp ok: true, systeminfo: dicebot.info
 end
 
 get "/v1/diceroll" do
   result, secret, dices = diceroll(params[:system], params[:command])
 
-  if result.nil?
-    json ok: false
-  else
-    json ok: true, result: result, secret: secret, dices: dices
-  end
+  jsonp ok: true, result: result, secret: secret, dices: dices
 end
 
 get "/v1/onset" do
@@ -68,11 +72,28 @@ get "/v1/onset" do
     return BCDice::SYSTEMS.join("\n")
   end
 
-  result, secret, dices = diceroll(params[:sys] || "DiceBot", params[:text])
-
-  if result.nil?
-    "error"
-  else
+  begin
+    result, secret, dices = diceroll(params[:sys] || "DiceBot", params[:text])
     "onset" + result
+  rescue UnsupportedDicebot, CommandError
+    "error"
   end
+end
+
+not_found do
+  jsonp ok: false, reason: "not found"
+end
+
+error UnsupportedDicebot do
+  status 400
+  jsonp ok: false, reason: "unsupported dicebot"
+end
+
+error CommandError do
+  status 400
+  jsonp ok: false, reason: "unsupported command"
+end
+
+error do
+  jsonp ok: false
 end
