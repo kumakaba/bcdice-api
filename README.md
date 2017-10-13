@@ -30,7 +30,7 @@ $ bundle exec unicorn -l 127.0.0.1:9292 -c unicorn.rb -D
 $ kill -QUIT `cat /tmp/bcdice-api.unicorn.pid`
 ```
 
-実際に運用する場合には、UnicornやPumaの利用をお勧めします。（[参考資料](http://recipes.sinatrarb.com/p/deployment/nginx_proxied_to_unicorn)）
+本家ではPumaが入ってますが、こっちはunicornで動かしています。nginxを前段に置く運用が前提。
 
 ## API
 

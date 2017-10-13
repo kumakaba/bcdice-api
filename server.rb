@@ -7,6 +7,7 @@ require 'sinatra'
 require 'sinatra/jsonp'
 require 'bcdice_wrap'
 require 'exception'
+require 'hashids'
 
 module BCDiceAPI
   VERSION = "0.5.1"
@@ -14,7 +15,37 @@ end
 
 
 helpers do
+
+  def logger
+    return @logger unless @logger.nil?
+    @logger = ::Logger.new($stdout) # こうしないとstrerrに吐いてしまう
+  end
+
+  def get_serial(increment=1)
+
+    serial_path = ENV['bcdice.serial_path']
+    serial = nil
+
+    File.open(serial_path, File::RDWR|File::CREAT, 0644) do |f|
+      f.flock(File::LOCK_EX)
+      serial = f.read.to_i
+      serial += 10000 if (serial < 10000)
+      serial += increment
+      f.rewind
+      f.write(serial)
+      f.flush
+      f.truncate(f.pos)
+    end
+
+    return serial
+  end
+
   def diceroll(system, command)
+
+    if(system.nil?)
+      system = 'DiceBot'
+    end
+
     dicebot = BCDice::DICEBOTS[system]
     if dicebot.nil?
       raise UnsupportedDicebot
@@ -29,14 +60,17 @@ helpers do
     bcdice.setDir("bcdice/extratables",system)
     bcdice.setCollectRandResult(true)
 
+    system = bcdice.getGameType()
     result, secret = bcdice.dice_command
     dices = bcdice.getRandResults.map {|dice| {faces: dice[1], value: dice[0]}}
 
+    logger.info(sprintf('[%s] (%s) "%s" %s (%s) %s',request.ip,system,command,result.to_s,secret.to_s,dices.inspect))
+  
     if result.nil?
       raise CommandError
     end
 
-    return result, secret, dices
+    return system, result, secret, dices
   end
 end
 
@@ -62,9 +96,39 @@ get "/v1/systeminfo" do
 end
 
 get "/v1/diceroll" do
-  result, secret, dices = diceroll(params[:system], params[:command])
+  system, result, secret, dices = diceroll(params[:system], params[:command])
 
-  jsonp ok: true, result: result, secret: secret, dices: dices
+  jsonp ok: true, result: result, secret: secret, dices: dices, system: system
+end
+
+# 逐次結果を作るという意味ではPOSTで受けても良いのでは説
+# POSTならcacheされないし
+post "/v1/diceroll" do
+  system, result, secret, dices = diceroll(params[:system], params[:command])
+
+  jsonp ok: true, result: result, secret: secret, dices: dices, system: system
+end
+
+# pidとtimestamp(to_f)でhashids生成
+# 簡易的uniqidとしての用途
+post "/v1/hashids" do
+  hashids_salt     = ENV['bcdice.salt'] || 'hogehoge'
+  hashids_serverid = ENV['bcdice.serverid'].to_i || 1
+  hashids = Hashids.new(hashids_salt)
+
+  values = []
+  values.push(hashids_serverid)
+  values.push(get_serial())
+  # 当初timeの値でやろうとした
+  #values.push(Process.pid)
+  #timenow = Time.now
+  #values.push(timenow.tv_sec - 1500000000) # 過去に戻ることも無いので生成桁を軽くするためザックリ引いておく
+  #values.push(timenow.to_f.to_s.split(/\./).pop.to_i)
+
+  result = hashids.encode(values)
+  logger.info(sprintf('[%s] (hashids) %s -> %s',request.ip,values.inspect,result))
+
+  jsonp ok: true, result: result
 end
 
 get "/v1/onset" do
@@ -73,7 +137,7 @@ get "/v1/onset" do
   end
 
   begin
-    result, secret, dices = diceroll(params[:sys] || "DiceBot", params[:text])
+    system, result, secret, dices = diceroll(params[:sys] || "DiceBot", params[:text])
     "onset" + result
   rescue UnsupportedDicebot, CommandError
     "error"

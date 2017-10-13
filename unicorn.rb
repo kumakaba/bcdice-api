@@ -1,4 +1,14 @@
 
+#ENV['APP_ENV'] = 'production'
+ENV['APP_ENV'] = 'development'
+
+# serial用 カウンタ数値保持用ファイルのpath
+ENV['bcdice.serial_path'] = '/tmp/bcdice-api.serial'
+# hashids用 複数で分散する際は一緒にしておいてserveridの方を変える
+ENV['bcdice.salt'] = 'hogehoge'
+# hashids用 複数で分散する際にサーバー別に変えておく
+ENV['bcdice.serverid'] = '1'
+
 @dir = "#{File.dirname(__FILE__)}/"
 
 worker_processes 3
@@ -10,4 +20,6 @@ timeout 30
 pid "/tmp/bcdice-api.unicorn.pid"
 stdout_path "/tmp/bcdice-api.unicorn.stdout.log"
 stderr_path "/tmp/bcdice-api.unicorn.stderr.log"
+
+logger Logger.new($stdout)
 

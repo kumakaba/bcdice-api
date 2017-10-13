@@ -1,4 +1,13 @@
 
+#ENV['APP_ENV'] = 'production'
+ENV['APP_ENV'] = 'development'
+
+# serial用 カウンタ数値保持用ファイルのpath
+ENV['bcdice.serial_path'] = '/tmp/bcdice-api.serial'
+# hashids用 複数で分散する際はsaltは一緒にしておいてserveridの方を変える
+ENV['bcdice.salt'] = 'hogehoge'
+ENV['bcdice.serverid'] = '1'
+
 @dir = "#{File.dirname(__FILE__)}/"
 
 worker_processes 3
