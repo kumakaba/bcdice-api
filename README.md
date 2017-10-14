@@ -41,6 +41,8 @@ Method                           | Description
 [/v1/systeminfo](/docs/api.md#systeminfo)   | ダイスボットのシステム情報取得
 [/v1/diceroll](/docs/api.md#diceroll) | ダイスボットのコマンドを実行
 [/v1/onset](/docs/api.md#onset)       | Onset!互換
+[/v1/serial](/docs/api.md#serial)       | サーバー生成の連番を取得
+[/v1/hashids](/docs/api.md#hashids)       | serialを元にして生成した文字列を取得
 
 ## Cases
 
