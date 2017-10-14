@@ -109,6 +109,15 @@ post "/v1/diceroll" do
   jsonp ok: true, result: result, secret: secret, dices: dices, system: system
 end
 
+# 連番
+post "/v1/serial" do
+  result = {}
+  result['server_id'] = ENV['bcdice.serverid'].to_i || 1
+  result['value'] = get_serial()
+
+  jsonp ok: true, result: result
+end
+
 # pidとtimestamp(to_f)でhashids生成
 # 簡易的uniqidとしての用途
 post "/v1/hashids" do
@@ -119,11 +128,6 @@ post "/v1/hashids" do
   values = []
   values.push(hashids_serverid)
   values.push(get_serial())
-  # 当初timeの値でやろうとした
-  #values.push(Process.pid)
-  #timenow = Time.now
-  #values.push(timenow.tv_sec - 1500000000) # 過去に戻ることも無いので生成桁を軽くするためザックリ引いておく
-  #values.push(timenow.to_f.to_s.split(/\./).pop.to_i)
 
   result = hashids.encode(values)
   logger.info(sprintf('[%s] (hashids) %s -> %s',request.ip,values.inspect,result))
