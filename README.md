@@ -57,4 +57,7 @@ Method                           | Description
 
 ## The Auther
 
-酒田　シンジ (@NKMR6194)
+Forked by くまかば (@kumakaba)
+
+Original Auther 酒田　シンジ (@NKMR6194)
+
