@@ -2,7 +2,7 @@
 
 BCDiceを提供するAPIサーバー (unicorn起動版)
 
-[![Build Status](https://travis-ci.org/NKMR6194/bcdice-api.svg?branch=master)](https://travis-ci.org/NKMR6194/bcdice-api)
+[![Build Status](https://travis-ci.org/kumakaba/bcdice-api.svg?branch=master)](https://travis-ci.org/kumakaba/bcdice-api)
 
 ## Demo
 
