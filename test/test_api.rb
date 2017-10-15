@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 ENV["RACK_ENV"] = "test"
+ENV['bcdice.serial_path'] = "/tmp/bcdice-api.test.serial"
+
 require "test/unit"
 require "rack/test"
 
@@ -86,9 +88,11 @@ class API_Test < Test::Unit::TestCase
 
     json = JSON.parse(last_response.body)
 
-    assert last_response.bad_request?
-    assert_false json["ok"]
-    assert_equal json["reason"], "unsupported dicebot"
+    assert last_response.ok?
+    assert json["ok"]
+    assert json["result"]
+    assert json["dices"]
+    assert_false json["secret"]
   end
 
   def test_unexpected_command
@@ -149,4 +153,28 @@ class API_Test < Test::Unit::TestCase
     assert_false json["ok"]
     assert_equal json["reason"], "not found"
   end
+
+  def test_serial
+    post "/v1/serial"
+
+    json = JSON.parse(last_response.body)
+
+    assert last_response.ok?
+    assert json["ok"]
+    assert json["result"]
+    assert_match /^\d+$/, json["result"]["server_id"].to_s
+    assert_match /^\d+$/, json["result"]["value"].to_s
+  end
+
+  def test_hashids
+    post "/v1/hashids"
+
+    json = JSON.parse(last_response.body)
+
+    assert last_response.ok?
+    assert json["ok"]
+    assert json["result"]
+    assert_kind_of String, json["result"]
+  end
+
 end

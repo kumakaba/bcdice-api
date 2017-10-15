@@ -29,7 +29,6 @@ helpers do
     File.open(serial_path, File::RDWR|File::CREAT, 0644) do |f|
       f.flock(File::LOCK_EX)
       serial = f.read.to_i
-      serial += 10000 if (serial < 10000)
       serial += increment
       f.rewind
       f.write(serial)
@@ -109,11 +108,13 @@ post "/v1/diceroll" do
   jsonp ok: true, result: result, secret: secret, dices: dices, system: system
 end
 
-# 連番
+# 連番生成
 post "/v1/serial" do
   result = {}
-  result['server_id'] = ENV['bcdice.serverid'].to_i || 1
+  result['server_id'] = ENV['bcdice.serverid'].to_i
   result['value'] = get_serial()
+
+  logger.info(sprintf('[%s] (serial) -> %d',request.ip,result['value']))
 
   jsonp ok: true, result: result
 end
@@ -122,12 +123,12 @@ end
 # 簡易的uniqidとしての用途
 post "/v1/hashids" do
   hashids_salt     = ENV['bcdice.salt'] || 'hogehoge'
-  hashids_serverid = ENV['bcdice.serverid'].to_i || 1
+  hashids_serverid = ENV['bcdice.serverid'].to_i
   hashids = Hashids.new(hashids_salt)
 
   values = []
   values.push(hashids_serverid)
-  values.push(get_serial())
+  values.push(get_serial() + 10000)
 
   result = hashids.encode(values)
   logger.info(sprintf('[%s] (hashids) %s -> %s',request.ip,values.inspect,result))
