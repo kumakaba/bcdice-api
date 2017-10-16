@@ -163,18 +163,20 @@ class API_Test < Test::Unit::TestCase
     assert json["ok"]
     assert json["result"]
     assert_match /^\d+$/, json["result"]["server_id"].to_s
-    assert_match /^\d+$/, json["result"]["value"].to_s
+    assert_match /^\d+$/, json["result"]["serial"].to_s
   end
 
-  def test_hashids
-    post "/v1/hashids"
+  def test_hashid
+    post "/v1/hashid"
 
     json = JSON.parse(last_response.body)
 
     assert last_response.ok?
     assert json["ok"]
     assert json["result"]
-    assert_kind_of String, json["result"]
+    assert_match /^\d+$/, json["result"]["server_id"].to_s
+    assert_match /^\d+$/, json["result"]["serial"].to_s
+    assert_kind_of String, json["result"]["hashid"]
   end
 
 end

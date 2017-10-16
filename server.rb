@@ -44,6 +44,9 @@ helpers do
     if(system.nil?)
       system = 'DiceBot'
     end
+    if(system.empty?)
+      system = 'DiceBot'
+    end
 
     dicebot = BCDice::DICEBOTS[system]
     if dicebot.nil?
@@ -112,25 +115,30 @@ end
 post "/v1/serial" do
   result = {}
   result['server_id'] = ENV['bcdice.serverid'].to_i
-  result['value'] = get_serial()
+  result['serial'] = get_serial()
 
-  logger.info(sprintf('[%s] (serial) -> %d',request.ip,result['value']))
+  logger.info(sprintf('[%s] (serial) -> %d',request.ip,result['serial']))
 
   jsonp ok: true, result: result
 end
 
 # pidとtimestamp(to_f)でhashids生成
 # 簡易的uniqidとしての用途
-post "/v1/hashids" do
-  hashids_salt     = ENV['bcdice.salt'] || 'hogehoge'
-  hashids_serverid = ENV['bcdice.serverid'].to_i
-  hashids = Hashids.new(hashids_salt)
+post "/v1/hashid" do
+  salt     = ENV['bcdice.salt'] || 'hogehoge'
+  serverid = ENV['bcdice.serverid'].to_i
+  hashids = Hashids.new(salt)
+  serial = get_serial()
+
+  result = {}
+  result['server_id'] = serverid
+  result['serial'] = serial
 
   values = []
-  values.push(hashids_serverid)
-  values.push(get_serial() + 10000)
+  values.push(serverid)
+  values.push(serial + 10000)
+  result['hashid'] = hashids.encode(values)
 
-  result = hashids.encode(values)
   logger.info(sprintf('[%s] (hashids) %s -> %s',request.ip,values.inspect,result))
 
   jsonp ok: true, result: result

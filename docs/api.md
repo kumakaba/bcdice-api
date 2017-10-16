@@ -164,14 +164,14 @@ onset: (6D10>35) ＞ 41[8,2,5,8,10,8] ＞ 41 ＞ 成功
   "ok":true,
   "result":{
     "server_id":1,
-    "value":123456
+    "serial":12345
   }
 }
 ```
 
 
 
-## hashids
+## hashid
 
 serialの値を元にhashidsを用いて短めのユニークな文字列を生成する。
 UUID程の一意性は不要だがサーバー単位でのユニークは確保したい際に使用。
@@ -179,7 +179,7 @@ UUID程の一意性は不要だがサーバー単位でのユニークは確保�
 
 ### URL (POST)
 
-`/v1/hashids`
+`/v1/hashid`
 
 ### 引数
 
@@ -190,7 +190,11 @@ UUID程の一意性は不要だがサーバー単位でのユニークは確保�
 ```json
 {
   "ok":true,
-  "result":"MOUdRo"
+  "result":{
+    "server_id":1,
+    "serial":12346,
+    "hashid":"KXhgRo"
+  }
 }
 ```
 
