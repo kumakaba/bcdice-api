@@ -56,6 +56,8 @@ helpers do
       raise CommandError
     end
 
+    command = command.gsub(/[\s　]/, ' ')
+
     bcdice = BCDiceMaker.new.newBcDice
     bcdice.setDiceBot(dicebot)
     bcdice.setMessage(command)

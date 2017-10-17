@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 ENV["RACK_ENV"] = "test"
 ENV['bcdice.serial_path'] = "/tmp/bcdice-api.test.serial"
+ENV['bcdice.serverid'] = "99"
 
 require "test/unit"
 require "rack/test"
@@ -51,6 +52,19 @@ class API_Test < Test::Unit::TestCase
 
   def test_diceroll
     get "/v1/diceroll?system=DiceBot&command=1d100<=70"
+
+    json = JSON.parse(last_response.body)
+
+    assert last_response.ok?
+    assert json["ok"]
+    assert json["result"]
+    assert json["dices"]
+    assert_false json["secret"]
+  end
+
+  def test_diceroll2
+    data = {"command":"1d100<=70　hoge　hoge"}
+    post "/v1/diceroll", data
 
     json = JSON.parse(last_response.body)
 
