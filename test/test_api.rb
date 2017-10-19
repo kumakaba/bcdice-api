@@ -75,6 +75,32 @@ class API_Test < Test::Unit::TestCase
     assert_false json["secret"]
   end
 
+  def test_diceroll_gametype
+    data = {"system":"SwordWorld2.0", "command":"K20"}
+    post "/v1/diceroll", data
+
+    json = JSON.parse(last_response.body)
+
+    assert last_response.ok?
+    assert json["ok"]
+    assert json["result"]
+    assert json["dices"]
+    assert_false json["secret"]
+  end
+
+  def test_diceroll_classname
+    data = {"system":"SwordWorld2_0", "command":"K20"}
+    post "/v1/diceroll", data
+
+    json = JSON.parse(last_response.body)
+
+    assert last_response.ok?
+    assert json["ok"]
+    assert json["result"]
+    assert json["dices"]
+    assert_false json["secret"]
+  end
+
   def test_extratable
     get "/v1/diceroll?system=KanColle&command=WPFA"
 

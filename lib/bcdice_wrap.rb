@@ -9,6 +9,9 @@ class BCDice
   DICEBOTS = (DiceBotLoader.collectDiceBots + [DiceBot.new]).
     map { |diceBot| [diceBot.gameType, diceBot] }.
     to_h.
+    merge(
+        (DiceBotLoader.collectDiceBots + [DiceBot.new]).
+         map { |diceBot| [diceBot.class.to_s, diceBot] }.to_h).
     freeze
 
   SYSTEMS = DICEBOTS.keys.

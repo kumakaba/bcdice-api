@@ -50,9 +50,11 @@ helpers do
 
     dicebot = BCDice::DICEBOTS[system]
     if dicebot.nil?
+      logger.warn(sprintf('[%s] (%s) "%s" UnsupportedDicebot',request.ip,system,command))
       raise UnsupportedDicebot
     end
     if command.nil?
+      logger.warn(sprintf('[%s] (%s) "nil" CommandError',request.ip,system))
       raise CommandError
     end
 
